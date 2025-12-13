@@ -10,16 +10,42 @@
 </head>
 <body>
 
-    <div id="loginOverlay" class="login-overlay">
-        <div class="login-box">
-            <h2>🔐 Patient Login</h2>
-            <p>Enter the username provided by the hospital.</p>
-            <input type="text" id="usernameInput" placeholder="e.g. john123">
-            <button onclick="login()">Access Portal</button>
-        </div>
-    </div>
-
     <div class="patient-container">
+        
+        <main class="dashboard">
+            <header>
+                <h1>👋 Hello, <span id="dispName">Patient</span></h1>
+                <p>Welcome to your recovery dashboard. Review your status and plans below.</p>
+            </header>
+
+            <div class="card status-card">
+                <h3>🏥 Admission Status</h3>
+                <div class="info-grid">
+                    <div><small>Doctor</small><strong id="dispDoctor">--</strong></div>
+                    <div><small>Department</small><strong id="dispDept">--</strong></div>
+                    <div><small>Room / Bed</small><strong id="dispRoom">--</strong></div>
+                    <div><small>Status</small><span id="dispStatus" class="badge">--</span></div>
+                </div>
+            </div>
+            
+            <div class="card follow-up-card">
+                <h3>🔔 Next Checkup / Status</h3>
+                <p>Your scheduled follow-up: <strong id="dispFollowUp">--</strong></p>
+            </div>
+
+            <div class="card">
+                <h3>💊 My Medications Schedule</h3>
+                <ul id="medList" class="med-list">
+                    <li>Loading medications...</li>
+                </ul>
+            </div>
+
+            <div class="card">
+                <h3>📋 Latest Doctor's Remarks</h3>
+                <div id="logList" class="log-container">
+                    </div>
+            </div>
+        </main>
         
         <aside class="ai-sidebar">
             <div class="chat-header">
@@ -50,41 +76,6 @@
             </div>
         </aside>
 
-        <main class="dashboard">
-            <header>
-                <h1>👋 Hello, <span id="dispName">Patient</span></h1>
-                <p>Welcome to your recovery dashboard. Review your status and plans below.</p>
-            </header>
-
-            <div class="card status-card">
-                <h3>🏥 Admission Status</h3>
-                <div class="info-grid">
-                    <div><small>Doctor</small><strong id="dispDoctor">--</strong></div>
-                    <div><small>Department</small><strong id="dispDept">--</strong></div>
-                    <div><small>Room / Bed</small><strong id="dispRoom">--</strong></div>
-                    <div><small>Status</small><span id="dispStatus" class="badge">--</span></div>
-                </div>
-            </div>
-            
-            <div class="card follow-up-card">
-                <h3>🔔 Next Checkup</h3>
-                <p>Your scheduled follow-up is on: <strong id="dispFollowUp">January 15, 2026</strong> at 10:00 AM.</p>
-            </div>
-
-            <div class="card">
-                <h3>💊 My Medications Schedule</h3>
-                <ul id="medList" class="med-list">
-                    <li>Loading medications...</li>
-                </ul>
-            </div>
-
-            <div class="card">
-                <h3>📋 Latest Doctor's Remarks</h3>
-                <div id="logList" class="log-container">
-                    </div>
-            </div>
-        </main>
-        
     </div>
 
     <script src="patient.js"></script>

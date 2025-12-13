@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Smart Hospital Admin Portal</title>
+    <link rel="stylesheet" href="Hospital-Management.css" />
+  </head>
+  <body>
+    <div class="admin-container">
+      <!-- Sidebar Navigation -->
+      <aside class="sidebar">
+        <h2>🏥 Admin Portal</h2>
+        <button class="nav-btn active" onclick="switchTab('admission')">
+          Admit Patient
+        </button>
+        <button class="nav-btn" onclick="switchTab('care')">
+          Patient Care & Rounds
+        </button>
+        <button class="nav-btn" onclick="switchTab('discharge')">
+          Discharge & Summary
+        </button>
+
+        
+      </aside>
+
+      <!-- Main Content Area -->
+      <main class="content">
+        <!-- SECTION 1: ADMISSION -->
+        <div id="admission" class="tab-content active">
+          <div class="card">
+            <h2>New Patient Admission</h2>
+            <form id="admissionForm">
+              <!-- Row 1: Basic Info -->
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <label>Patient Name</label>
+                  <input
+                    type="text"
+                    id="pName"
+                    required
+                    placeholder="John Doe"
+                  />
+                </div>
+                <div class="form-group half-width">
+                  <label>Age</label>
+                  <input type="number" id="pAge" required placeholder="30" />
+                </div>
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <label>Emergency Contact</label>
+                  <input
+                    type="text"
+                    id="pContact"
+                    required
+                    placeholder="+1 234..."
+                  />
+                </div>
+                <div class="form-group half-width">
+                  <label>Email ID (Optional)</label>
+                  <input
+                    type="email"
+                    id="pEmail"
+                    placeholder="patient@example.com"
+                  />
+                </div>
+              </div>
+
+              <hr
+                style="border: 0; border-top: 1px solid #eee; margin: 20px 0"
+              />
+
+              <!-- Row 2: Hospital Details (NEW) -->
+              <div class="form-group">
+                <label>Department</label>
+                <select id="pDepartment" required class="patient-select">
+                  <option value="">-- Select Department --</option>
+                  <option value="Cardiology">Cardiology</option>
+                  <option value="Neurology">Neurology</option>
+                  <option value="Orthopedics">Orthopedics</option>
+                  <option value="General Surgery">General Surgery</option>
+                  <option value="ICU">ICU</option>
+                </select>
+              </div>
+
+              <div class="form-group">
+                <label>Assign Doctor</label>
+                <input
+                  type="text"
+                  id="pDoctor"
+                  required
+                  placeholder="Dr. Sarah Smith"
+                />
+              </div>
+
+              <div class="form-row">
+                <div class="form-group half-width">
+                  <label>Room No</label>
+                  <input type="text" id="pRoom" required placeholder="A-101" />
+                </div>
+                <div class="form-group half-width">
+                  <label>Bed No</label>
+                  <input type="text" id="pBed" required placeholder="05" />
+                </div>
+              </div>
+
+              <button type="submit" class="btn-primary">
+                Generate Credentials & Admit
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- SECTION 2: PATIENT CARE -->
+        <div id="care" class="tab-content">
+          <div class="card">
+            <h2>Ongoing Care & Rounds</h2>
+            <div class="form-group">
+              <label>Select Patient</label>
+              <select id="carePatientSelect" class="patient-select">
+                <option value="">-- Select Admitted Patient --</option>
+              </select>
+            </div>
+
+            <form id="careForm">
+              <div class="form-group">
+                <label>Running Medicine Prescribed</label>
+                <input
+                  type="text"
+                  id="medicineInput"
+                  placeholder="e.g. Paracetamol 500mg"
+                />
+              </div>
+              <div class="form-group">
+                <label>Daily Observation / Report Log</label>
+                <textarea
+                  id="logInput"
+                  rows="4"
+                  placeholder="Patient showing signs of improvement..."
+                ></textarea>
+              </div>
+              <div class="form-group">
+                <label>Upload Report (Simulated)</label>
+                <input type="file" id="reportInput" />
+              </div>
+              <button type="submit" class="btn-secondary">
+                Update Patient Record
+              </button>
+            </form>
+          </div>
+        </div>
+
+        <!-- SECTION 3: DISCHARGE -->
+        <div id="discharge" class="tab-content">
+          <div class="card">
+            <h2>Patient Discharge & Report Generation</h2>
+
+            <div class="form-group">
+              <label>Select Patient to Discharge</label>
+              <select id="dischargePatientSelect" class="patient-select">
+                <option value="">-- Select Patient --</option>
+              </select>
+            </div>
+
+            <div
+              class="ai-section"
+              style="
+                background: #e3f2fd;
+                padding: 20px;
+                border-radius: 12px;
+                border: 1px solid #90caf9;
+              "
+            >
+              <p style="color: #1565c0; margin-bottom: 15px">
+                📄 <strong>Protocol:</strong> Clicking below will compile the
+                Patient's Admission Details, Doctor's Notes, Medicine History,
+                and Daily Logs into a formal
+                <strong>PDF Discharge Summary</strong> and mark them as
+                discharged in the database.
+              </p>
+              <button
+                onclick="handleDischarge()"
+                class="btn-ai"
+                style="
+                  background: linear-gradient(135deg, #e63946 0%, #d62828 100%);
+                "
+              >
+                ⬇️ Finalize Discharge & Download PDF
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Debug List to show it's working -->
+        <div class="patient-list">
+          <h3>Current Database (Live View)</h3>
+          <ul id="patientListDisplay">
+            <li>No patients admitted yet.</li>
+          </ul>
+        </div>
+      </main>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  </body>
+</html>

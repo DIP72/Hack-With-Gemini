@@ -1,0 +1,20 @@
+{
+  "patients": [
+    {
+      "id": "1765617999125",
+      "name": "Atmadeep  Maity",
+      "age": "34",
+      "contact": "7679897076",
+      "email": "Not Provided",
+      "department": "Neurology",
+      "doctor": "Maity the BIDI King and Mr. anirban suar",
+      "room": "A-121",
+      "bed": "01",
+      "username": "atmadeep624",
+      "password": "pz10y6gb",
+      "status": "Discharged",
+      "logs": [],
+      "medicines": []
+    }
+  ]
+}

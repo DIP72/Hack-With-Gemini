@@ -1,7 +1,6 @@
 {
   "users": [
-    { "username": "admin", "password": "admin123", "role": "admin" },
-    { "username": "doctor", "password": "doc123", "role": "doctor" },
-    { "username": "patient", "password": "pat123", "role": "patient" }
+    { "username": "manager1", "password": "manage123", "role": "management" },
+    { "username": "patient1", "password": "patient123", "role": "patient" }
   ]
 }

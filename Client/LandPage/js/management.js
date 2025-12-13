@@ -55,6 +55,7 @@ function login(e) {
     );
 
     // Redirect based on role
+    console.log("Login successful:", user);
     if (user.role === "management") {
         window.location.href = "../../Management/views/management.html";
     } else if (user.role === "patient") {

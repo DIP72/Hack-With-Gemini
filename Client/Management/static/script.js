@@ -1,295 +1,260 @@
-// API URL (The JSON Server)
-const API_URL = "http://localhost:3000/patients";
+/****************************************************
+ * SMART HOSPITAL – MINIMAL JSON VERSION
+ * Storage: localStorage (Pure JSON, No Backend)
+ ****************************************************/
 
-// We still keep a local array for easy display, 
-// but we sync it with the database.
-let patients = []; 
+// ---------- JSON DATABASE ----------
+let patients = [];
+let patientsJSON = null;
 
-// --- 1. LOAD DATA ON STARTUP ---
-document.addEventListener("DOMContentLoaded", () => {
-    fetchPatients();
-});
-
-// Function to Fetch Data from JSON File
-async function fetchPatients() {
+// Load patients from JSON file
+async function loadPatientsData() {
     try {
-        const response = await fetch(API_URL);
-        patients = await response.json();
-        updatePatientList(); // Update the UI
+        const response = await fetch('data/patients.json');
+        patientsJSON = await response.json();
+
+        // Priority:
+        // 1️⃣ localStorage (runtime data)
+        // 2️⃣ JSON file (initial seed)
+        patients = JSON.parse(localStorage.getItem("patients")) 
+                   || patientsJSON.patients 
+                   || [];
+
     } catch (error) {
-        console.error("Error loading data:", error);
+        console.error("Error loading patients JSON:", error);
+        patients = JSON.parse(localStorage.getItem("patients")) || [];
     }
 }
 
-// --- TAB SWITCHING LOGIC ---
-function switchTab(tabId) {
-    document.querySelectorAll('.tab-content').forEach(tab => tab.classList.remove('active'));
-    document.querySelectorAll('.nav-btn').forEach(btn => btn.classList.remove('active'));
-    document.getElementById(tabId).classList.add('active');
-    
-    const buttons = document.querySelectorAll('.nav-btn');
-    if(tabId === 'admission') buttons[0].classList.add('active');
-    if(tabId === 'care') buttons[1].classList.add('active');
-    if(tabId === 'discharge') buttons[2].classList.add('active');
-
-    // Refresh data when switching tabs to ensure we have latest JSON
-    fetchPatients().then(() => updateDropdowns());
+// Save JSON to localStorage
+function savePatients() {
+    localStorage.setItem("patients", JSON.stringify(patients));
 }
 
-// --- 2. ADMISSION LOGIC (POST REQUEST) ---
-document.getElementById('admissionForm').addEventListener('submit', async function(e) {
+// ---------- LOAD ON START ----------
+document.addEventListener("DOMContentLoaded", async () => {
+    await loadPatientsData();
+    updatePatientList();
+    updateDropdowns();
+});
+
+// ---------- TAB SWITCHING ----------
+function switchTab(tabId) {
+    document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+
+    document.getElementById(tabId).classList.add('active');
+
+    if (tabId === 'admission') document.querySelectorAll('.nav-btn')[0].classList.add('active');
+    if (tabId === 'care') document.querySelectorAll('.nav-btn')[1].classList.add('active');
+    if (tabId === 'discharge') document.querySelectorAll('.nav-btn')[2].classList.add('active');
+
+    updateDropdowns();
+}
+
+// ---------- ADMISSION ----------
+document.getElementById('admissionForm').addEventListener('submit', function (e) {
     e.preventDefault();
 
-    const name = document.getElementById('pName').value;
-    const age = document.getElementById('pAge').value;
-    const contact = document.getElementById('pContact').value;
-    const email = document.getElementById('pEmail').value || "Not Provided"; 
-    const department = document.getElementById('pDepartment').value;
-    const doctor = document.getElementById('pDoctor').value;
-    const room = document.getElementById('pRoom').value;
-    const bed = document.getElementById('pBed').value;
+    const name = pName.value;
+    const age = pAge.value;
+    const contact = pContact.value;
+    const email = pEmail.value || "Not Provided";
+    const department = pDepartment.value;
+    const doctor = pDoctor.value;
+    const room = pRoom.value;
+    const bed = pBed.value;
 
     const username = name.split(' ')[0].toLowerCase() + Math.floor(Math.random() * 1000);
     const password = Math.random().toString(36).slice(-8);
 
-    const newPatient = {
-        // ID is generated automatically by JSON Server usually, but we can pass one
-        id: Date.now().toString(), 
-        name, age, contact, email, department, doctor, room, bed,
+    patients.push({
+        id: Date.now().toString(),
+        name, age, contact, email,
+        department, doctor, room, bed,
         username, password,
-        status: 'Admitted',
-        logs: [],
-        medicines: []
-    };
+        status: "Admitted",
+        medicines: [],
+        logs: []
+    });
 
-    // SAVE TO JSON FILE
-    try {
-        await fetch(API_URL, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(newPatient)
-        });
+    savePatients();
+    updatePatientList();
+    updateDropdowns();
 
-        alert(`✅ Patient Admitted to Database!\nUsername: ${username}\nPassword: ${password}`);
-        document.getElementById('admissionForm').reset();
-        fetchPatients(); // Reload data
-    } catch (error) {
-        alert("Error saving to database");
-    }
+    alert(`✅ Patient Admitted\nUsername: ${username}\nPassword: ${password}`);
+    this.reset();
 });
 
-// --- 3. CARE LOGIC (PUT REQUEST) ---
-document.getElementById('careForm').addEventListener('submit', async function(e) {
+// ---------- CARE ----------
+document.getElementById('careForm').addEventListener('submit', function (e) {
     e.preventDefault();
-    
-    const patientId = document.getElementById('carePatientSelect').value;
-    const medicine = document.getElementById('medicineInput').value;
-    const log = document.getElementById('logInput').value;
 
+    const patientId = carePatientSelect.value;
     if (!patientId) return alert("Select a patient");
 
-    // 1. Find current patient data
-    const patient = patients.find(p => p.id == patientId);
-    
-    // 2. Update local object
-    if(medicine) patient.medicines.push(medicine);
-    if(log) patient.logs.push({ date: new Date().toLocaleString(), note: log });
+    const patient = patients.find(p => p.id === patientId);
 
-    // 3. Send UPDATE to JSON File
-    try {
-        await fetch(`${API_URL}/${patientId}`, {
-            method: "PUT",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(patient)
+    if (medicineInput.value)
+        patient.medicines.push(medicineInput.value);
+
+    if (logInput.value)
+        patient.logs.push({
+            date: new Date().toLocaleString(),
+            note: logInput.value
         });
-        
-        alert("Record Updated in Database!");
-        document.getElementById('careForm').reset();
-        fetchPatients();
-    } catch (error) {
-        console.error("Update failed", error);
-    }
+
+    savePatients();
+    alert("✅ Care record updated");
+    this.reset();
 });
 
-// --- 4. DISCHARGE LOGIC (PDF GENERATION) ---
-async function handleDischarge() {
-    const patientId = document.getElementById('dischargePatientSelect').value;
-    if (!patientId) return alert("Please select a patient to discharge!");
+// ---------- DISCHARGE ----------
+function handleDischarge() {
+    const patientId = dischargePatientSelect.value;
+    if (!patientId) return alert("Select a patient");
 
-    // Find the patient object
-    const patient = patients.find(p => p.id == patientId);
+    const patient = patients.find(p => p.id === patientId);
 
-    const confirmDischarge = confirm(`Are you sure you want to discharge ${patient.name}?\n\nThis will download their medical record as a PDF.`);
+    if (!confirm(`Discharge ${patient.name}?`)) return;
 
-    if (confirmDischarge) {
-        // 1. Generate the PDF
-        generatePDF(patient);
+    generatePDF(patient);
+    patient.status = "Discharged";
 
-        // 2. Update Status in Database
-        patient.status = 'Discharged';
-        
-        try {
-            await fetch(`${API_URL}/${patientId}`, {
-                method: "PUT",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify(patient)
-            });
+    savePatients();
+    updatePatientList();
+    updateDropdowns();
 
-            alert(`✅ Patient Discharged Successfully.\nPDF Report Downloading...`);
-            fetchPatients().then(() => updateDropdowns()); // Refresh UI
-            
-        } catch (error) {
-            console.error("Error updating status:", error);
-            alert("Error updating database.");
-        }
-    }
+    alert("✅ Patient discharged & PDF downloaded");
 }
 
-// --- HELPER: GENERATE PDF ---
+// ---------- PDF GENERATION ----------
 function generatePDF(p) {
     const { jsPDF } = window.jspdf;
     const doc = new jsPDF();
 
-    // -- HEADER --
-    doc.setFillColor(41, 128, 185); // Blue header
+    doc.setFillColor(41, 128, 185);
     doc.rect(0, 0, 210, 40, 'F');
+
     doc.setFontSize(22);
-    doc.setTextColor(255, 255, 255);
+    doc.setTextColor(255);
     doc.text("SMART HOSPITAL MANAGEMENT", 105, 15, null, null, "center");
+
     doc.setFontSize(16);
     doc.text("DISCHARGE SUMMARY REPORT", 105, 30, null, null, "center");
 
-    // -- PATIENT DETAILS --
-    doc.setTextColor(0, 0, 0);
+    doc.setTextColor(0);
     doc.setFontSize(12);
-    let y = 50; // Vertical starting position
+    let y = 50;
 
     doc.setFont(undefined, 'bold');
-    doc.text("PATIENT DETAILS:", 20, y);
+    doc.text("PATIENT DETAILS", 20, y);
     doc.setFont(undefined, 'normal');
     y += 10;
-    
+
     doc.text(`Name: ${p.name}`, 20, y);
     doc.text(`Age: ${p.age}`, 120, y);
     y += 8;
+
     doc.text(`Patient ID: ${p.username}`, 20, y);
     doc.text(`Contact: ${p.contact}`, 120, y);
     y += 8;
+
     doc.text(`Email: ${p.email}`, 20, y);
     y += 15;
 
-    // -- ADMISSION DETAILS --
     doc.setFont(undefined, 'bold');
-    doc.text("HOSPITAL ADMISSION INFO:", 20, y);
+    doc.text("ADMISSION DETAILS", 20, y);
     doc.setFont(undefined, 'normal');
     y += 10;
-    
-    doc.text(`Attending Doctor: Dr. ${p.doctor}`, 20, y);
+
+    doc.text(`Doctor: Dr. ${p.doctor}`, 20, y);
     doc.text(`Department: ${p.department}`, 120, y);
     y += 8;
-    doc.text(`Room No: ${p.room}`, 20, y);
-    doc.text(`Bed No: ${p.bed}`, 120, y);
+
+    doc.text(`Room: ${p.room}`, 20, y);
+    doc.text(`Bed: ${p.bed}`, 120, y);
     y += 15;
 
-    // -- MEDICINES --
-    doc.setLineWidth(0.5);
-    doc.line(20, y, 190, y); // Horizontal line
+    doc.line(20, y, 190, y);
     y += 10;
 
     doc.setFont(undefined, 'bold');
-    doc.text("MEDICATIONS PRESCRIBED:", 20, y);
-    y += 10;
+    doc.text("MEDICATIONS", 20, y);
     doc.setFont(undefined, 'normal');
+    y += 10;
 
-    if (p.medicines && p.medicines.length > 0) {
-        p.medicines.forEach((med, index) => {
-            doc.text(`${index + 1}. ${med}`, 25, y);
+    if (p.medicines.length) {
+        p.medicines.forEach((m, i) => {
+            doc.text(`${i + 1}. ${m}`, 25, y);
             y += 7;
         });
     } else {
-        doc.text("No specific medications recorded.", 25, y);
+        doc.text("No medicines recorded", 25, y);
         y += 7;
     }
-    y += 10;
 
-    // -- DAILY LOGS --
+    y += 10;
     doc.line(20, y, 190, y);
     y += 10;
-    
-    doc.setFont(undefined, 'bold');
-    doc.text("DOCTOR'S NOTES / DAILY LOGS:", 20, y);
-    y += 10;
-    doc.setFont(undefined, 'normal');
 
-    if (p.logs && p.logs.length > 0) {
-        p.logs.forEach((log) => {
-            // Check if we are at the bottom of the page
+    doc.setFont(undefined, 'bold');
+    doc.text("DOCTOR NOTES", 20, y);
+    doc.setFont(undefined, 'normal');
+    y += 10;
+
+    if (p.logs.length) {
+        p.logs.forEach(l => {
             if (y > 270) {
                 doc.addPage();
                 y = 20;
             }
             doc.setFontSize(10);
-            doc.setTextColor(100, 100, 100);
-            doc.text(`[${log.date}]`, 25, y);
-            
-            doc.setTextColor(0, 0, 0);
+            doc.text(`[${l.date}]`, 25, y);
+            y += 5;
+
             doc.setFontSize(12);
-            // Split long text so it fits the page width
-            const splitNote = doc.splitTextToSize(log.note, 150);
-            doc.text(splitNote, 25, y + 5);
-            
-            y += (splitNote.length * 7) + 10; // Adjust spacing based on text length
+            const text = doc.splitTextToSize(l.note, 150);
+            doc.text(text, 25, y);
+            y += text.length * 7 + 5;
         });
     } else {
-        doc.text("No daily logs recorded.", 25, y);
+        doc.text("No logs recorded", 25, y);
     }
 
-    // -- FOOTER --
-    const pageHeight = doc.internal.pageSize.height;
     doc.setFontSize(10);
-    doc.setTextColor(150);
-    doc.text("Generated by Smart Hospital System", 105, pageHeight - 10, null, null, "center");
+    doc.text("Generated by Smart Hospital System", 105, 287, null, null, "center");
 
-    // Save File
-    doc.save(`${p.name.replace(" ", "_")}_Discharge_Summary.pdf`);
+    doc.save(`${p.name.replace(/\s/g, "_")}_Discharge_Report.pdf`);
 }
 
-// --- HELPER: UPDATE DROPDOWNS ---
+// ---------- DROPDOWNS ----------
 function updateDropdowns() {
-    const careSelect = document.getElementById('carePatientSelect');
-    const dischargeSelect = document.getElementById('dischargePatientSelect');
-    
-    careSelect.innerHTML = '<option value="">-- Select Admitted Patient --</option>';
-    dischargeSelect.innerHTML = '<option value="">-- Select Patient --</option>';
+    carePatientSelect.innerHTML = '<option value="">-- Select Admitted Patient --</option>';
+    dischargePatientSelect.innerHTML = '<option value="">-- Select Patient --</option>';
 
-    const admittedPatients = patients.filter(p => p.status === 'Admitted');
-
-    admittedPatients.forEach(p => {
-        const option = `<option value="${p.id}">${p.name} (ID: ${p.username})</option>`;
-        careSelect.innerHTML += option;
-        dischargeSelect.innerHTML += option;
+    patients.filter(p => p.status === "Admitted").forEach(p => {
+        const opt = `<option value="${p.id}">${p.name} (${p.username})</option>`;
+        carePatientSelect.innerHTML += opt;
+        dischargePatientSelect.innerHTML += opt;
     });
 }
 
-// --- HELPER: DEBUG LIST ---
+// ---------- PATIENT LIST ----------
 function updatePatientList() {
-    const list = document.getElementById('patientListDisplay');
-    list.innerHTML = '';
-    
-    if (patients.length === 0) {
-        list.innerHTML = '<li>No patients in JSON database.</li>';
+    patientListDisplay.innerHTML = "";
+
+    if (!patients.length) {
+        patientListDisplay.innerHTML = "<li>No patients stored</li>";
         return;
     }
 
     patients.forEach(p => {
-        const li = document.createElement('li');
+        const li = document.createElement("li");
         li.innerHTML = `
-            <div>
-                <strong>${p.name}</strong> <span style="font-size:0.8em">(${p.department})</span>
-                <br><small>Dr. ${p.doctor} | Room: ${p.room}</small>
-            </div>
-            <div>${p.status}</div>
+            <strong>${p.name}</strong> (${p.department})<br>
+            Dr. ${p.doctor} | Room ${p.room} | <b>${p.status}</b>
         `;
-        list.appendChild(li);
+        patientListDisplay.appendChild(li);
     });
 }

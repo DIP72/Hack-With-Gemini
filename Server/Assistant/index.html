@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hospital AI Voice Assistant (Medicine Cycle)</title>
+    <style>
+        body {
+            background-color: #f4f7f9;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+        }
+
+        .voice-assistant-card {
+            max-width: 500px;
+            width: 95%;
+            background-color: #ffffff;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 50, 150, 0.1);
+            border-top: 5px solid #007bff;
+        }
+
+        .card-title {
+            text-align: center;
+            color: #007bff;
+            margin-bottom: 25px;
+            font-weight: 600;
+        }
+
+        .action-button {
+            display: block;
+            width: 100%;
+            margin: 20px 0;
+            padding: 15px 30px;
+            font-size: 1.1em;
+            font-weight: bold;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.1s ease;
+        }
+
+        .start-button {
+            background-color: #28a745;
+        }
+
+        .start-button:hover:not(:disabled) {
+            background-color: #1e7e34;
+        }
+
+        .stop-button {
+            background-color: #dc3545;
+            animation: pulse 1.5s infinite;
+        }
+
+        .stop-button:hover:not(:disabled) {
+            background-color: #c82333;
+        }
+        
+        .action-button:disabled {
+            background-color: #888;
+            cursor: not-allowed;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.7); }
+            70% { box-shadow: 0 0 0 10px rgba(220, 53, 69, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(220, 53, 69, 0); }
+        }
+
+        .status-text {
+            text-align: center;
+            margin-top: 15px;
+            font-weight: 600;
+            color: #6c757d;
+            padding: 8px;
+            border-radius: 4px;
+            background-color: #e9ecef;
+        }
+
+        .status-recording {
+            color: #dc3545;
+        }
+
+        .response-area {
+            margin-top: 25px;
+            border-top: 1px solid #e9ecef;
+            padding-top: 15px;
+        }
+
+        .box-title {
+            font-size: 1em;
+            font-weight: 500;
+            color: #495057;
+            margin-bottom: 8px;
+        }
+
+        .assistant-title {
+            color: #007bff;
+            margin-top: 15px;
+        }
+
+        .transcript-box, .response-box {
+            margin-bottom: 15px;
+        }
+
+        .transcript-text {
+            font-style: italic;
+            background-color: #f8f9fa;
+            padding: 12px;
+            border-left: 4px solid #adb5bd;
+            border-radius: 4px;
+            line-height: 1.5;
+        }
+
+        .response-text {
+            font-weight: bold;
+            background-color: #e9f7fe;
+            padding: 12px;
+            border-left: 4px solid #007bff;
+            border-radius: 4px;
+            color: #1e3a6c;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+<div class="voice-assistant-card">
+    <h2 class="card-title">💊 Patient Medicine Cycle Assistant</h2>
+    <p style="text-align: center; color: #555;">Ask about your dose, timing, or side effects for Paracetamol or Amlodipine.</p>
+    
+    <button id="recordButton" class="action-button start-button">
+        🎙️ Start Speaking
+    </button>
+
+    <p id="statusText" class="status-text">Press the button and ask about your medication...</p>
+
+    <div class="response-area">
+        <div class="transcript-box">
+            <h3 class="box-title">User Transcript:</h3>
+            <p id="transcriptText" class="transcript-text">Awaiting spoken input...</p>
+        </div>
+        
+        <div class="response-box">
+            <h3 class="box-title assistant-title">Assistant Response:</h3>
+            <p id="responseText" class="response-text">Awaiting AI action...</p>
+        </div>
+    </div>
+</div>
+
+<script>
+    const API_URL = 'http://localhost:5000/api/transcribe'; 
+
+    const recordButton = document.getElementById('recordButton');
+    const statusText = document.getElementById('statusText');
+    const transcriptText = document.getElementById('transcriptText');
+    const responseText = document.getElementById('responseText');
+    
+    let mediaRecorder;
+    let audioChunks = [];
+    let isRecording = false;
+
+    // --- Utility Functions ---
+    const updateStatus = (text, isRecordingState = false) => {
+        statusText.textContent = text;
+        statusText.classList.toggle('status-recording', isRecordingState);
+    };
+
+    const toggleRecordingState = (recording) => {
+        isRecording = recording;
+        recordButton.classList.toggle('start-button', !recording);
+        recordButton.classList.toggle('stop-button', recording);
+        recordButton.textContent = recording ? '🛑 Stop & Process' : '🎙️ Start Speaking';
+    };
+
+    const playAudio = (audioUrl) => {
+        const audio = new Audio(audioUrl);
+        audio.play().catch(e => console.error("Audio playback failed:", e));
+    };
+
+    // --- Main Logic: Start Recording ---
+    const startRecording = async () => {
+        if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+            updateStatus('Error: MediaDevices not supported.');
+            return;
+        }
+
+        try {
+            const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
+            mediaRecorder = new MediaRecorder(stream, { mimeType: 'audio/webm;codecs=opus' });
+            
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    audioChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                const audioBlob = new Blob(audioChunks, { type: 'audio/webm' });
+                audioChunks = []; 
+                uploadAudio(audioBlob);
+                stream.getTracks().forEach(track => track.stop()); 
+            };
+
+            mediaRecorder.start();
+            toggleRecordingState(true);
+            updateStatus('🔴 Recording... Ask about your dose or timing.', true);
+            transcriptText.textContent = 'Awaiting spoken input...';
+            responseText.textContent = 'Awaiting AI action...';
+
+        } catch (error) {
+            console.error('Error starting recording:', error);
+            updateStatus('Error accessing microphone. Check permissions.');
+        }
+    };
+
+    // --- Main Logic: Stop Recording ---
+    const stopRecording = () => {
+        if (mediaRecorder && mediaRecorder.state === 'recording') {
+            mediaRecorder.stop();
+            toggleRecordingState(false);
+            updateStatus('Processing audio with Gemini AI...');
+            recordButton.disabled = true; 
+        }
+    };
+
+    // --- Main Logic: Upload Audio to Backend ---
+    const uploadAudio = async (audioBlob) => {
+        try {
+            const formData = new FormData();
+            formData.append('audioFile', audioBlob, 'input_audio.webm');
+            
+            const response = await fetch(API_URL, {
+                method: 'POST',
+                body: formData,
+            });
+
+            if (!response.ok) {
+                const errorData = await response.json();
+                throw new Error(errorData.error || 'Server processing failed.');
+            }
+
+            const data = await response.json();
+
+            transcriptText.textContent = data.transcript;
+            responseText.textContent = data.voiceAssistantResponse;
+            updateStatus('✅ Done! Response received and playing.');
+            
+            if (data.audioUrl) {
+                playAudio(data.audioUrl);
+            }
+        } catch (error) {
+            console.error('Error uploading or processing audio:', error);
+            updateStatus(`❌ Error: ${error.message}. Check console and server status.`);
+        } finally {
+            recordButton.disabled = false; 
+        }
+    };
+
+    // --- Event Listener ---
+    recordButton.addEventListener('click', () => {
+        if (isRecording) {
+            stopRecording();
+        } else {
+            startRecording();
+        }
+    });
+
+</script>
+</body>
+</html>

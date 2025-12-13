@@ -87,7 +87,30 @@ header {
     align-items: center;
     gap: 15px;
 }
+.radio-group div{
+    display: flex;
+    gap: 10px;
+    align-items: center;
+}
+#patient, #management {
+    width: 15px;
+    height: 15px;
+    cursor: pointer;
+}
+#patient{
+    margin-left: 54px;
+}
 .nav-j {
+    color: white;
+    text-decoration: none;
+    background: linear-gradient(135deg, #17a2b8, #0056b3);
+    padding: 10px 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.nav-login{
     color: white;
     text-decoration: none;
     background: linear-gradient(135deg, #17a2b8, #0056b3);

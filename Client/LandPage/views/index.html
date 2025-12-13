@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,6 +9,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <link rel="stylesheet" href="./../css/style.css">
 </head>
+
 <body>
     <header>
         <nav class="navbar">
@@ -47,7 +49,8 @@
                 <h2>Welcome to Modern Healthcare Management</h2>
                 <p>Streamline perioperative processes with our intelligent dashboard system.</p>
                 <div class="hero-images">
-                    <img src="https://media.istockphoto.com/id/501707098/photo/surgeons-operating-on-patient-in-operating-theatre-under-lights.jpg?s=612x612&w=0&k=20&c=aCNe7gIVCrm5wyvd5OA1ewW1h50yIIT7Tgndrd-0ml0=" alt="Surgery Room">
+                    <img src="https://media.istockphoto.com/id/501707098/photo/surgeons-operating-on-patient-in-operating-theatre-under-lights.jpg?s=612x612&w=0&k=20&c=aCNe7gIVCrm5wyvd5OA1ewW1h50yIIT7Tgndrd-0ml0="
+                        alt="Surgery Room">
                     <img src="https://patientbetter.com/wp-content/uploads/2024/05/patient-care.jpg" alt="Patient Care">
                     <img src="https://serensahealth.com/assets/img/blogs/636094154018.jpeg" alt="Recovery">
                 </div>
@@ -69,10 +72,14 @@
                     <div class="form-group">
                         <label><i class="fas fa-user-circle"></i> Select Role:</label>
                         <div class="radio-group">
-                            <input type="radio" id="patient" name="role" value="patient" required>
-                            <label for="patient"><i class="fas fa-user-injured"></i> Patient</label>
-                            <input type="radio" id="management" name="role" value="management" required>
-                            <label for="management"><i class="fas fa-users-cog"></i> Management</label>
+                            <div>
+                                <label for="patient"><i class="fas fa-user-injured"></i> Patient</label>
+                                <input type="radio" id="patient" name="role" value="patient" required>
+                            </div>
+                            <div>
+                                <label for="management"><i class="fas fa-users-cog"></i> Management</label>
+                                <input type="radio" id="management" name="role" value="management" required>
+                            </div>
                         </div>
                     </div>
                     <button type="submit">Login</button>
@@ -95,4 +102,5 @@
 
     <script src="js/script.js"></script>
 </body>
+
 </html>

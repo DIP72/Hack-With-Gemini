@@ -1,39 +1,7 @@
 {
   "users": [
-    {
-      "username": "admin",
-      "password": "user123",
-      "role": "patient",
-      "name": "admin",
-      "id": "123456",
-      "age": 35,
-      "blood_group": "O+",
-      "condition": "Appendicitis",
-      "prescriptions": [
-        {"name": "Amoxicillin 500mg", "quantity": "14 tablets"},
-        {"name": "Paracetamol", "quantity": "10 tablets"}
-      ],
-      "checkups": [
-        {"date": "2025-12-20", "purpose": "Stitch Removal"},
-        {"date": "2026-01-05", "purpose": "General Assessment"}
-      ]
-    },
-    {
-      "username": "admin",
-      "password": "admin123",
-      "role": "management",
-      "name": "Dr. Admin",
-      "id": "MGT001"
-    }
-  ],
-  "inventory": [
-    { "id": 1, "name": "Propofol (Anesthesia)", "category": "surgical_supply", "quantity": "20ml" },
-    { "id": 2, "name": "Sterile Surgical Gloves", "category": "surgical_supply", "quantity": "4 pairs" },
-    { "id": 3, "name": "Amoxicillin 500mg", "category": "post_op_med", "quantity": "14 tablets" },
-    { "id": 4, "name": "Paracetamol", "category": "post_op_med", "quantity": "10 tablets" }
-  ],
-  "checkups": [
-    { "date": "2025-12-20", "purpose": "Stitch Removal" },
-    { "date": "2026-01-05", "purpose": "General Assessment" }
+    { "username": "admin", "password": "admin123", "role": "admin" },
+    { "username": "doctor", "password": "doc123", "role": "doctor" },
+    { "username": "patient", "password": "pat123", "role": "patient" }
   ]
 }

@@ -13,16 +13,38 @@ async function loadUsersData() {
 // DOM Elements
 const loginForm = document.getElementById('login-form');
 const loginMessage = document.getElementById('login-message');
+const navLogin = document.getElementById('nav-login');
+const navProfile = document.getElementById('nav-profile');
+const profileBtn = document.getElementById('profile-btn');
+const profileMenu = document.getElementById('profile-menu');
+const profileNameEl = document.getElementById('profile-name');
+const logoutBtn = document.getElementById('logout-btn');
 
 // Initialize the app
 async function init() {
     await loadUsersData();
     setupEventListeners();
+    updateNavbar();
 }
 
 // Setup Event Listeners
 function setupEventListeners() {
     loginForm.addEventListener('submit', handleLogin);
+        if (navLogin) navLogin.addEventListener('click', (e)=>{
+            e.preventDefault();
+            // Smooth-scroll to the login form area and focus username
+            const loginSection = document.querySelector('.login-section') || document.getElementById('login-form');
+            if (loginSection && loginSection.scrollIntoView) {
+                loginSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+            }
+            const usr = document.getElementById('username');
+            if (usr) {
+                // focus after a short delay so that scrolling completes on some browsers
+                setTimeout(() => usr.focus(), 400);
+            }
+        });
+    if (profileBtn) profileBtn.addEventListener('click', toggleProfileMenu);
+    if (logoutBtn) logoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); logout(); });
 }
 
 // Handle Login
@@ -40,6 +62,8 @@ function handleLogin(e) {
     const user = usersData.users.find(u => u.username === username && u.password === password);
 
     if (user) {
+        // store a lightweight logged-in marker so navbar can update
+        localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name, role: user.role, username: user.username }));
         showLoginMessage(`Welcome, ${user.name}! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
             if (user.role === 'management') {
@@ -52,6 +76,36 @@ function handleLogin(e) {
     } else {
         showLoginMessage('Invalid username or password.', 'error');
     }
+}
+
+// Update navbar based on login state
+function updateNavbar() {
+    try {
+        const raw = localStorage.getItem('loggedInUser');
+        if (raw) {
+            const u = JSON.parse(raw);
+            if (navLogin) navLogin.style.display = 'none';
+            if (navProfile) navProfile.style.display = 'block';
+            if (profileNameEl) profileNameEl.textContent = u.name || u.username || 'User';
+        } else {
+            if (navLogin) navLogin.style.display = 'inline-block';
+            if (navProfile) navProfile.style.display = 'none';
+        }
+    } catch (e) { console.error('updateNavbar error', e); }
+}
+
+function toggleProfileMenu(e){
+    e && e.preventDefault();
+    if (!profileMenu) return;
+    const shown = profileMenu.style.display === 'block';
+    profileMenu.style.display = shown ? 'none' : 'block';
+}
+
+function logout(){
+    localStorage.removeItem('loggedInUser');
+    if (profileMenu) profileMenu.style.display = 'none';
+    updateNavbar();
+    showLoginMessage('Logged out successfully.', 'success');
 }
 
 // Show Login Message

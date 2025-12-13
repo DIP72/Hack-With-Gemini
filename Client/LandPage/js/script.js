@@ -3,7 +3,8 @@ let usersData = null;
 
 async function loadUsersData() {
     try {
-        const response = await fetch('data/users.json');
+        // users.json lives in Client/Data relative to this page (two levels up)
+        const response = await fetch('../../Data/users.json');
         usersData = await response.json();
     } catch (error) {
         console.error('Error loading users data:', error);
@@ -50,6 +51,8 @@ function setupEventListeners() {
 // Handle Login
 function handleLogin(e) {
     e.preventDefault();
+    // prevent other submit handlers from running and causing a real form submit
+    if (e.stopImmediatePropagation) e.stopImmediatePropagation();
 
     const username = document.getElementById('username').value;
     const password = document.getElementById('password').value;
@@ -67,13 +70,13 @@ function handleLogin(e) {
         localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name, role: selectedRole, username: user.username }));
         showLoginMessage(`Welcome, ${user.name}! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
-                if (selectedRole === 'management') {
-                    // go to Management portal (path from LandPage/views/index.html)
-                    window.location.href = '../../Management/views/Hospital-Management.html';
-                } else if (selectedRole === 'patient') {
-                    window.location.href = '../../Patient/Patient.html';
-                }
-        }, 2000);
+            if (selectedRole === 'management') {
+                // use replace to avoid leaving the login page in history
+                location.replace('../../Management/views/Hospital-Management.html');
+            } else if (selectedRole === 'patient') {
+                location.replace('../../Patient/Patient.html');
+            }
+        }, 800);
     } else {
         showLoginMessage('Invalid username or password.', 'error');
     }

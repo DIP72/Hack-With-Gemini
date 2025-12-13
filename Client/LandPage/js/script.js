@@ -67,11 +67,12 @@ function handleLogin(e) {
         localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name, role: selectedRole, username: user.username }));
         showLoginMessage(`Welcome, ${user.name}! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
-            if (selectedRole === 'management') {
-                window.location.href = 'management.html';
-            } else if (selectedRole === 'patient') {
-                window.location.href = '../../Patient/Patient.html';
-            }
+                if (selectedRole === 'management') {
+                    // go to Management portal (path from LandPage/views/index.html)
+                    window.location.href = '../../Management/views/Hospital-Management.html';
+                } else if (selectedRole === 'patient') {
+                    window.location.href = '../../Patient/Patient.html';
+                }
         }, 2000);
     } else {
         showLoginMessage('Invalid username or password.', 'error');

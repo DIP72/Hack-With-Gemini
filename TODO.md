@@ -1,5 +1,5 @@
-# TODO List for Navbar and Login Button Improvements
+# TODO: Implement Login Role Selection
 
-- [x] Update Client/LandPage/css/style.css to improve navbar alignment and attractiveness (add centering, padding, shadows, hover effects)
-- [x] Update Client/LandPage/js/script.js to change navLogin click event to scroll smoothly to login-section
-- [x] Test the changes to ensure navbar looks attractive and login button scrolls correctly
+- [x] Add radio buttons for "Patient" or "Management" selection in the login form in `Client/LandPage/views/index.html`
+- [x] Modify `handleLogin` function in `Client/LandPage/js/script.js` to capture selected role and redirect accordingly
+- [x] Test login functionality to ensure redirection works based on selection

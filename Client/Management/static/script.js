@@ -10,7 +10,7 @@ let patientsJSON = null;
 // Load patients from JSON file
 async function loadPatientsData() {
     try {
-        const response = await fetch('data/patients.json');
+        const response = await fetch('data/db.json');
         patientsJSON = await response.json();
 
         // Priority:

@@ -62,15 +62,15 @@ function handleLogin(e) {
     const user = usersData.users.find(u => u.username === username && u.password === password);
 
     if (user) {
+        const selectedRole = document.querySelector('input[name="role"]:checked').value;
         // store a lightweight logged-in marker so navbar can update
-        localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name, role: user.role, username: user.username }));
+        localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name, role: selectedRole, username: user.username }));
         showLoginMessage(`Welcome, ${user.name}! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
-            if (user.role === 'management') {
+            if (selectedRole === 'management') {
                 window.location.href = 'management.html';
-            } else {
-                // For patient role, could redirect to patient dashboard
-                alert(`Logged in as ${user.role}: ${user.name}\n\nPatient dashboard would load here.`);
+            } else if (selectedRole === 'patient') {
+                window.location.href = '../../Patient/Patient.html';
             }
         }, 2000);
     } else {

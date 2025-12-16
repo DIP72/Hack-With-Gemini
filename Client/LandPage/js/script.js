@@ -1,64 +1,49 @@
-// Load users data
-let usersData = null;
+// --------------------- SCRIPT.JS ---------------------
 
-async function loadUsersData() {
-    try {
-        const response = await fetch('data/users.json');
-        usersData = await response.json();
-    } catch (error) {
-        console.error('Error loading users data:', error);
-    }
-}
+// Global users data
+let usersData = null;
 
 // DOM Elements
 const loginForm = document.getElementById('login-form');
 const loginMessage = document.getElementById('login-message');
-const navLogin = document.getElementById('nav-login');
-const navProfile = document.getElementById('nav-profile');
-const profileBtn = document.getElementById('profile-btn');
-const profileMenu = document.getElementById('profile-menu');
-const profileNameEl = document.getElementById('profile-name');
-const logoutBtn = document.getElementById('logout-btn');
 
-// Initialize the app
-async function init() {
-    await loadUsersData();
-    setupEventListeners();
-    updateNavbar();
+// --------------------- LOAD USERS ---------------------
+async function loadUsersData() {
+    try {
+        // Relative path from this HTML file to users.json
+        // Adjust "../Data/users.json" if your folder structure is different
+        const response = await fetch('../../Data/users.json');
+
+        if (!response.ok) {
+            throw new Error('Users file not found!');
+        }
+
+        usersData = await response.json();
+
+        // Basic validation
+        if (!usersData.users || !Array.isArray(usersData.users)) {
+            throw new Error("Invalid users.json format: 'users' array missing");
+        }
+
+        console.log('✅ Users loaded:', usersData.users);
+
+    } catch (error) {
+        console.error('Error loading users data:', error);
+        showLoginMessage('Error loading users data. Please check the console.', 'error');
+        usersData = { users: [] }; // fallback to empty
+    }
 }
 
-// Setup Event Listeners
-function setupEventListeners() {
-    loginForm.addEventListener('submit', handleLogin);
-        if (navLogin) navLogin.addEventListener('click', (e)=>{
-            e.preventDefault();
-            // Smooth-scroll to the login form area and focus username
-            const loginSection = document.querySelector('.login-section') || document.getElementById('login-form');
-            if (loginSection && loginSection.scrollIntoView) {
-                loginSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
-            }
-            const usr = document.getElementById('username');
-            if (usr) {
-                // focus after a short delay so that scrolling completes on some browsers
-                setTimeout(() => usr.focus(), 400);
-            }
-        });
-    if (profileBtn) profileBtn.addEventListener('click', toggleProfileMenu);
-    if (logoutBtn) logoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); logout(); });
-}
-
-// Handle Login
-function handleLogin(e) {
-    e.preventDefault();
-
-    const username = document.getElementById('username').value;
-    const password = document.getElementById('password').value;
+// --------------------- HANDLE LOGIN ---------------------
+function handleLogin(event) {
+    event.preventDefault();
 
     if (!usersData) {
-        showLoginMessage('Error loading user data. Please try again.', 'error');
+        showLoginMessage('User data not loaded.', 'error');
         return;
     }
 
+<<<<<<< HEAD
     const user = usersData.users.find(u => u.username === username && u.password === password);
     if (user) {
         // prefer the role stored in users.json (this prevents mismatch with the UI radios)
@@ -79,43 +64,58 @@ function handleLogin(e) {
     }
     }
 }
+=======
+    const username = document.getElementById('username').value.trim();
+    const password = document.getElementById('password').value.trim();
+    const roleEl = document.querySelector('input[name="role"]:checked');
 
-// Update navbar based on login state
-function updateNavbar() {
-    try {
-        const raw = localStorage.getItem('loggedInUser');
-        if (raw) {
-            const u = JSON.parse(raw);
-            if (navLogin) navLogin.style.display = 'none';
-            if (navProfile) navProfile.style.display = 'block';
-            if (profileNameEl) profileNameEl.textContent = u.name || u.username || 'User';
-        } else {
-            if (navLogin) navLogin.style.display = 'inline-block';
-            if (navProfile) navProfile.style.display = 'none';
+    if (!roleEl) {
+        showLoginMessage('Please select a role.', 'error');
+        return;
+    }
+>>>>>>> e2b88b0759c1f9694db662ff0c4450ecbb02321f
+
+    const role = roleEl.value;
+
+    const user = usersData.users.find(u =>
+        u.username === username &&
+        u.password === password &&
+        u.role === role
+    );
+
+    if (!user) {
+        showLoginMessage('Invalid username, password, or role.', 'error');
+        return;
+    }
+
+    // Store login info for session
+    localStorage.setItem('loggedInUser', JSON.stringify({
+        username: user.username,
+        role: user.role
+    }));
+
+    showLoginMessage(`Welcome, ${user.username}! Redirecting...`, 'success');
+
+    // Redirect based on role
+    setTimeout(() => {
+        if (user.role === 'management') {
+            // Adjust this path relative to the HTML file
+            window.location.href = '../../Management/views/Hospital-Management.html';
+        } else if (user.role === 'patient') {
+            window.location.href = '../../Patient/Patient.html';
         }
-    } catch (e) { console.error('updateNavbar error', e); }
+    }, 1000);
 }
 
-function toggleProfileMenu(e){
-    e && e.preventDefault();
-    if (!profileMenu) return;
-    const shown = profileMenu.style.display === 'block';
-    profileMenu.style.display = shown ? 'none' : 'block';
-}
-
-function logout(){
-    localStorage.removeItem('loggedInUser');
-    if (profileMenu) profileMenu.style.display = 'none';
-    updateNavbar();
-    showLoginMessage('Logged out successfully.', 'success');
-}
-
-// Show Login Message
+// --------------------- SHOW LOGIN MESSAGE ---------------------
 function showLoginMessage(message, type) {
     loginMessage.textContent = message;
-    loginMessage.className = type;
+    loginMessage.className = type; // You can define CSS for 'success' and 'error'
     loginMessage.style.display = 'block';
 }
 
-// Initialize on load
-document.addEventListener('DOMContentLoaded', init);
+// --------------------- INIT ---------------------
+document.addEventListener('DOMContentLoaded', async () => {
+    await loadUsersData();
+    loginForm.addEventListener('submit', handleLogin);
+});

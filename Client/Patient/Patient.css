@@ -1,10 +1,17 @@
-/* --- Global Variables (Assume primary color is defined in an imported style.css) --- */
-/* If you don't have an imported file, define colors here: */
+/* --- Global Variables and Color Palette --- */
 :root {
-    --primary-color: #2575fc; /* Blue for action/emphasis */
-    --secondary-color: #6a11cb; /* Purple for AI header */
-    --bg-light: #f0f2f5;
-    --card-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    /* Colors derived from the image */
+    --primary-blue: #1a75ff; /* Bright Blue (Used for highlights, sidebar BG) */
+    --secondary-blue: #1c2738; /* Deep Charcoal Blue (Used for AI chat BG) */
+    --light-bg: #f4f6f8; /* Very Light Background for Dashboard */
+    --light-card: #ffffff; /* White card backgrounds */
+    --dark-text: #333333; /* Primary text color on light BG */
+    --muted-text: #707a8c; /* Secondary, less prominent text */
+    --ai-header: #1a75ff; /* Bright Blue for AI Header */
+    --ai-chat-bubble: #ffffff; /* White for AI text bubble */
+    --user-chat-bubble: #1a75ff; /* Blue for User text bubble */
+    --border-light: #e0e4e8; /* Light gray border */
+    --card-shadow: 0 4px 10px rgba(0, 0, 0, 0.05); /* Soft shadow for light mode */
 }
 
 * {
@@ -15,16 +22,17 @@
 
 body {
     font-family: 'Poppins', sans-serif;
-    background-color: var(--bg-light);
+    background-color: var(--light-bg);
+    color: var(--dark-text);
     height: 100vh;
-    overflow: hidden; /* Prevent body scroll */
+    overflow: hidden;
 }
 
-/* --- Login Overlay --- */
+/* --- Login Overlay --- (Minimal styling to fit the theme) */
 .login-overlay {
     position: fixed;
     top: 0; left: 0; width: 100%; height: 100%;
-    background: rgba(0,0,0,0.8);
+    background: rgba(0, 0, 0, 0.7);
     display: flex;
     justify-content: center;
     align-items: center;
@@ -32,67 +40,150 @@ body {
 }
 
 .login-box {
-    background: white;
+    background: var(--light-card);
     padding: 40px;
-    border-radius: 15px;
-    text-align: center;
+    border-radius: 8px;
     width: 350px;
-    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    box-shadow: var(--shadow-dark);
 }
+
+.login-box h2 { color: var(--primary-blue); margin-bottom: 15px; text-align: center; }
+.login-box p { color: var(--muted-text); margin-bottom: 20px; text-align: center; }
 
 .login-box input {
     width: 100%;
-    padding: 12px;
-    margin: 20px 0;
-    border: 2px solid #ddd;
-    border-radius: 8px;
-    outline-color: var(--primary-color);
+    padding: 10px;
+    margin: 8px 0;
+    border: 1px solid var(--border-light);
+    border-radius: 4px;
+    color: var(--dark-text);
+    background: var(--light-bg);
+    outline-color: var(--primary-blue);
 }
 
 .login-box button {
-    background: var(--primary-color);
+    background: var(--primary-blue);
     color: white;
-    padding: 12px;
+    padding: 10px;
     width: 100%;
     border: none;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
-    font-weight: bold;
-    transition: background 0.3s;
+    font-weight: 600;
+    margin-top: 15px;
 }
-.login-box button:hover { background: #1a56cc; }
 
-/* --- MAIN LAYOUT (AI Left, Dashboard Right) --- */
+/* --- MAIN LAYOUT (Dashboard Left, AI Right) --- */
 .patient-container {
     display: flex;
     height: 100vh;
 }
 
-/* LEFT SIDEBAR - AI CHAT (Flex 1) */
-.ai-sidebar {
-    flex: 1; /* Approximately 35% of the width */
-    background: white;
-    border-right: 1px solid #ddd;
+/* LEFT SIDE: DASHBOARD (Approx 60% width) */
+.dashboard {
+    flex: 3; /* Wider main content */
+    padding: 30px 40px;
+    overflow-y: auto;
+    background-color: var(--light-bg);
+}
+
+.dashboard header { margin-bottom: 25px; }
+.dashboard h1 { 
+    color: var(--primary-blue); 
+    font-size: 1.8rem;
+    border-left: 4px solid var(--primary-blue); /* Style cue from image */
+    padding-left: 10px;
+}
+.dashboard p { color: var(--muted-text); font-size: 0.95rem; }
+
+.card {
+    background: var(--light-card);
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: var(--card-shadow);
+    margin-bottom: 20px;
+    border: 1px solid var(--border-light);
+}
+.card h3 { 
+    color: var(--dark-text); 
+    font-size: 1.2rem;
+    margin-bottom: 10px; 
+}
+
+
+/* Status Grid styling */
+.info-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 15px;
+    margin-top: 15px;
+    padding-top: 10px;
+    border-top: 1px solid var(--border-light);
+}
+
+.info-grid small { display: block; color: var(--muted-text); font-size: 0.8rem; margin-bottom: 4px; }
+.info-grid strong { font-size: 1rem; color: var(--dark-text); font-weight: 600; }
+
+/* Badges (from image) */
+.badge {
+    padding: 4px 8px;
+    border-radius: 12px;
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: inline-block;
+}
+.status-admitted { background: #fee2e2; color: #dc2626; } /* Reddish for Admitted/Alert */
+.status-discharged { background: #d1fae5; color: #059669; } /* Greenish for Discharged/OK */
+
+/* Medication List & Logs */
+.med-list, .log-container { list-style: none; margin-top: 10px; }
+.med-list li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-light);
     display: flex;
-    flex-direction: column;
-    box-shadow: 5px 0 20px rgba(0,0,0,0.05);
+    align-items: center;
+    justify-content: space-between;
+    color: var(--dark-text);
+}
+.med-list li:last-child { border-bottom: none; }
+
+.log-item {
+    border-left: 3px solid var(--primary-blue);
+    padding: 8px 12px;
+    margin-bottom: 8px;
+    background: var(--light-bg);
+    border-radius: 4px;
+}
+.log-item p { margin-top: 3px; font-size: 0.9rem; color: var(--dark-text); }
+
+
+/* --- RIGHT SIDE: AI CHATBOX (Approx 40% width) --- */
+.ai-sidebar {
+    flex: 2; /* Smaller side for chat */
+    background: var(--secondary-blue);
+    border-left: 1px solid #1a2533;
+    box-shadow: -5px 0 20px rgba(0, 0, 0, 0.4);
     min-width: 300px;
     max-width: 450px;
+    display: flex;
+    flex-direction: column;
 }
 
 .chat-header {
-    padding: 20px;
-    background: linear-gradient(135deg, var(--secondary-color) 0%, var(--primary-color) 100%);
+    padding: 15px 20px;
+    background: var(--ai-header); /* Solid bright blue */
     color: white;
     display: flex;
     align-items: center;
-    gap: 15px;
+    gap: 10px;
+    font-size: 1.1rem;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
 }
 
 .ai-avatar {
-    font-size: 1.5rem;
-    background: rgba(255,255,255,0.2);
-    padding: 10px;
+    font-size: 1.2rem;
+    background: rgba(255, 255, 255, 0.1);
+    padding: 8px;
     border-radius: 50%;
 }
 
@@ -100,39 +191,41 @@ body {
     flex: 1;
     padding: 20px;
     overflow-y: auto;
-    background: #f9f9f9;
+    background: var(--secondary-blue);
     display: flex;
     flex-direction: column;
-    gap: 15px;
+    gap: 12px;
 }
 
 .message {
-    padding: 12px 16px;
-    border-radius: 12px;
+    padding: 10px 14px;
+    border-radius: 18px; /* More rounded bubbles */
     max-width: 85%;
-    font-size: 0.95rem;
+    font-size: 0.9rem;
     line-height: 1.4;
-    word-wrap: break-word; /* Handle long URLs/text */
 }
 
 .ai-msg {
-    background: white;
+    background: #2c394b; /* Slightly lighter than BG for contrast */
     align-self: flex-start;
-    border-bottom-left-radius: 2px;
-    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-    border: 1px solid #eee;
+    border-bottom-left-radius: 4px;
+    color: white;
 }
+.ai-msg strong { color: var(--primary-blue); } 
 
 .user-msg {
-    background: var(--primary-color);
-    color: white;
+    background: var(--user-chat-bubble);
+    color: var(--dark-text); /* Black/Dark text on white bubble */
     align-self: flex-end;
-    border-bottom-right-radius: 2px;
+    border-bottom-right-radius: 4px;
+    font-weight: 500;
 }
 
+/* Chat Input Area */
 .chat-input-area {
     padding: 15px;
-    border-top: 1px solid #eee;
+    border-top: 1px solid #1a2533;
+    background: #2c394b; /* Matches AI message bubble */
     display: flex;
     gap: 10px;
     align-items: center;
@@ -140,99 +233,43 @@ body {
 
 .chat-input-area input {
     flex: 1;
-    padding: 12px;
-    border: 1px solid #ddd;
-    border-radius: 25px;
+    padding: 10px;
+    border: 1px solid #4b5563;
+    border-radius: 20px;
+    background: #374151; /* Dark input field */
+    color: white;
     outline: none;
 }
 
 .chat-input-area button {
-    background: var(--primary-color);
+    background: var(--primary-blue);
     color: white;
     border: none;
-    width: 45px;
-    height: 45px;
+    width: 40px;
+    height: 40px;
     border-radius: 50%;
     cursor: pointer;
-    font-size: 1.2rem;
+    font-size: 1rem;
     display: flex;
     align-items: center;
     justify-content: center;
 }
 
 .chat-input-area .upload-btn {
-    background: #e3f2fd; 
-    color: var(--primary-color);
+    background: #00bcd4; /* Accent color for camera */
+    font-size: 1.1rem;
 }
 
-/* RIGHT DASHBOARD (Flex 2) */
-.dashboard {
-    flex: 2; /* Approximately 65% of the width */
-    padding: 40px;
-    overflow-y: auto;
-}
-
-.dashboard header { margin-bottom: 30px; }
-.dashboard h1 { color: #333; }
-
-.card {
-    background: white;
-    padding: 25px;
-    border-radius: 15px;
-    box-shadow: var(--card-shadow);
-    margin-bottom: 25px;
-}
-
-.info-grid {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    gap: 20px;
-    margin-top: 15px;
-}
-
-.info-grid small { display: block; color: #888; margin-bottom: 5px; font-weight: 300; }
-.info-grid strong { font-size: 1.1rem; color: #333; font-weight: 600; }
-
-/* Status Badges */
-.badge {
-    padding: 5px 10px;
-    border-radius: 20px;
-    font-size: 0.9rem;
-    font-weight: bold;
-}
-.status-admitted { background: #fff3e0; color: #ff9800; }
-.status-discharged { background: #e8f5e9; color: #43a047; }
-
-/* Medication List */
-.med-list, .log-container { list-style: none; margin-top: 10px; }
-.med-list li {
-    padding: 12px 0;
-    border-bottom: 1px solid #eee;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-}
-.med-list li:last-child { border-bottom: none; }
-.med-list li strong { font-weight: 600; }
-
-.log-item {
-    border-left: 4px solid var(--primary-color);
-    padding: 10px;
-    margin-bottom: 10px;
-    background: #f9f9f9;
-    border-radius: 5px;
-}
-.log-item p { margin-top: 5px; font-size: 0.95rem; }
-
-/* Loading Animation for Chat */
+/* --- Utility / Loading Animation --- */
+/* The loading animation uses colors that work in the dark background */
 .loading-dots:after {
     content: ' .';
     animation: dots 1s steps(5, end) infinite;
 }
 
 @keyframes dots {
-    0%, 20% { color: rgba(0,0,0,0); text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
-    40% { color: #333; text-shadow: .25em 0 0 rgba(0,0,0,0), .5em 0 0 rgba(0,0,0,0); }
-    60% { text-shadow: .25em 0 0 #333, .5em 0 0 rgba(0,0,0,0); }
-    80%, 100% { text-shadow: .25em 0 0 #333, .5em 0 0 #333; }
+    0%, 20% { color: rgba(0, 0, 0, 0); text-shadow: .25em 0 0 rgba(0, 0, 0, 0), .5em 0 0 rgba(0, 0, 0, 0); }
+    40% { color: white; text-shadow: .25em 0 0 rgba(0, 0, 0, 0), .5em 0 0 rgba(0, 0, 0, 0); }
+    60% { text-shadow: .25em 0 0 white, .5em 0 0 rgba(0, 0, 0, 0); }
+    80%, 100% { text-shadow: .25em 0 0 white, .5em 0 0 white; }
 }

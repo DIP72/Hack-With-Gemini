@@ -1,13 +1,9 @@
-// login.js
-// Roles: management, patient
-
 let users = [];
 
 // DOM Elements
 const form = document.getElementById('login-form');
 const usernameEl = document.getElementById('username');
 const passwordEl = document.getElementById('password');
-const roleEl = document.getElementById('role');
 const messageEl = document.getElementById('login-message');
 
 // ---------------- LOAD USERS ----------------
@@ -30,10 +26,21 @@ async function loadUsers() {
 function login(e) {
     e.preventDefault();
 
+    // Get selected role from radio buttons
+    const roleEl = document.querySelector('input[name="role"]:checked');
+    if (!roleEl) {
+        messageEl.textContent = "Please select a role";
+        return;
+    }
+    const role = roleEl.value;
+
+    const username = usernameEl.value.trim();
+    const password = passwordEl.value.trim();
+
     const user = users.find(u =>
-        u.username === usernameEl.value.trim() &&
-        u.password === passwordEl.value.trim() &&
-        u.role === roleEl.value
+        u.username === username &&
+        u.password === password &&
+        u.role === role
     );
 
     if (!user) {
@@ -48,10 +55,11 @@ function login(e) {
     );
 
     // Redirect based on role
+    console.log("Login successful:", user);
     if (user.role === "management") {
-        window.location.href = "/management.html"; // Management dashboard page
+        window.location.href = "../../Management/views/management.html";
     } else if (user.role === "patient") {
-        window.location.href = "/patient.html"; // Patient page
+        window.location.href = "../../Patient/views/patient.html";
     }
 }
 

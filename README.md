@@ -1,7 +1,4 @@
    # Smart Perioperative Care System
-
-   ![Smart Perioperative Care System Logo](img/bulb-lamp-smart-health-logo-smart-choice_1093924-1158.avif)
-
    ## Overview
 
    🚀 The **Smart Perioperative Care System** is an innovative hospital management platform designed to streamline perioperative processes and enhance patient care through intelligent dashboards and voice-assisted medicine management. Built as a hackathon project by Team Avatars, this system leverages cutting-edge AI technology to provide seamless healthcare solutions.

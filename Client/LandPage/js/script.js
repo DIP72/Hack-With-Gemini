@@ -60,21 +60,23 @@ function handleLogin(e) {
     }
 
     const user = usersData.users.find(u => u.username === username && u.password === password);
-
     if (user) {
-        const selectedRole = document.querySelector('input[name="role"]:checked').value;
+        // prefer the role stored in users.json (this prevents mismatch with the UI radios)
+        const userRole = user.role || (document.querySelector('input[name="role"]:checked') && document.querySelector('input[name="role"]:checked').value) || 'patient';
         // store a lightweight logged-in marker so navbar can update
-        localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name, role: selectedRole, username: user.username }));
+        localStorage.setItem('loggedInUser', JSON.stringify({ name: user.name || user.username, role: userRole, username: user.username }));
         showLoginMessage(`Welcome, ${user.name}! Redirecting to dashboard...`, 'success');
         setTimeout(() => {
-            if (selectedRole === 'management') {
-                window.location.href = 'management.html';
-            } else if (selectedRole === 'patient') {
+            if (userRole === 'management') {
+                // redirect to the Management app's HTML page
+                window.location.href = '../../Management/views/Hospital-Management.html';
+            } else if (userRole === 'patient') {
                 window.location.href = '../../Patient/Patient.html';
             }
         }, 2000);
     } else {
         showLoginMessage('Invalid username or password.', 'error');
+    }
     }
 }
 
